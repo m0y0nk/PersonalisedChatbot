@@ -7,7 +7,7 @@ const PERSONAS = {
     id: "anshuman",
     name: "Anshuman Singh",
     emoji: "⚡",
-    tagline: "Sharp, practical, no-nonsense mentor",
+    tagline: "Quality trumps Quantity. Master the fundamentals.",
     suggestions: [
       "How do I stay consistent with coding?",
       "How to improve problem solving?",
