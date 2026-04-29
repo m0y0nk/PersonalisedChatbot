@@ -38,7 +38,7 @@ const PERSONAS = {
   },
 };
 
-const API_URL = import.meta.env.VITE_API_URL || "";
+const API_URL = "https://personalisedchatbot.onrender.com";
 
 // ─── Send Icon SVG ───────────────────────────────────────────────
 function SendIcon() {
@@ -90,7 +90,9 @@ function App() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/chat`, {
+      const targetUrl = new URL("/chat", API_URL).toString();
+      console.log("Fetching from:", targetUrl);
+      const res = await fetch(targetUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -102,12 +104,19 @@ function App() {
         }),
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
-        throw new Error(data.userMessage || "Something went wrong");
+        // Try to parse error message, fallback to status text
+        let errorMsg = "Server error";
+        try {
+          const errorData = await res.json();
+          errorMsg = errorData.userMessage || errorData.error || errorMsg;
+        } catch (e) {
+          errorMsg = `Error ${res.status}: ${res.statusText}`;
+        }
+        throw new Error(errorMsg);
       }
 
+      const data = await res.json();
       setMessages((prev) => [
         ...prev,
         { role: "bot", content: data.reply },
@@ -210,9 +219,8 @@ function App() {
                 return (
                   <div
                     key={i}
-                    className={`message ${
-                      msg.role === "user" ? "message-user" : "message-bot"
-                    }`}
+                    className={`message ${msg.role === "user" ? "message-user" : "message-bot"
+                      }`}
                   >
                     {msg.content}
                   </div>
